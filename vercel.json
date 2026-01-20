@@ -3,8 +3,11 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "express",
-  "public": "dist/public",
+  "output": "standalone",
   "env": {
     "DATABASE_URL": "@database_url"
-  }
+  },
+  "routes": [
+    { "src": "/(.*)", "dest": "/dist/index.cjs" }
+  ]
 }

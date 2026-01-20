@@ -1,17 +1,28 @@
 import { useProfile } from "@/hooks/use-profile";
 import { Background } from "@/components/Background";
 import { CustomCursor } from "@/components/CustomCursor";
-import { AudioPlayer } from "@/components/AudioPlayer";
+import { AudioPlayer, type AudioPlayerHandle } from "@/components/AudioPlayer";
 import { DiscordWidget } from "@/components/DiscordWidget";
 import { SocialLinks } from "@/components/SocialLinks";
 import { Loader2, Heart, Music, Gamepad2, Globe, Mail, Link as LinkIcon, Code, Video, Camera, Eye, MapPin, Users } from "lucide-react";
 import Tilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
 import { useLanyard } from "@/hooks/use-lanyard";
+import { useRef } from "react";
 
 export default function Home() {
   const { data: profile, isLoading, error } = useProfile();
   const { data: lanyard } = useLanyard({ userId: profile?.discord.userId });
+  const audioRef = useRef<AudioPlayerHandle>(null);
+
+  // Play music on any click in the profile
+  const handleProfileClick = () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => {
+        // Audio playback failed
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -54,84 +65,92 @@ export default function Home() {
     <>
       <CustomCursor config={profile.cursor} />
       <Background config={profile.background} effects={profile.effects} theme={profile.theme} />
-      <AudioPlayer config={profile.audio} />
+      <AudioPlayer ref={audioRef} config={profile.audio} />
 
-      <main className="min-h-screen py-8 px-4 flex flex-col items-center justify-start relative z-10 overflow-y-auto gap-4">
+      <main className="min-h-screen py-8 px-4 flex flex-col items-center justify-start relative z-10 overflow-y-auto gap-4" onClick={handleProfileClick}>
         
-        {/* Main Profile Card */}
-        <Tilt
-          tiltMaxAngleX={profile.effects.tiltMaxAngle}
-          tiltMaxAngleY={profile.effects.tiltMaxAngle}
-          perspective={1000}
-          scale={1.01}
-          transitionSpeed={2000}
-          gyroscope={true}
-          className="w-full max-w-[320px]"
-        >
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="glass-card rounded-[1.75rem] w-full relative overflow-hidden bg-[#1a1a1a]/80 backdrop-blur-2xl border border-white/5 shadow-2xl"
-          >
-            {/* Banner */}
-            <div className="h-28 w-full relative">
-              <img 
-                src={profile.banner || "/assets/banner.jpg"} 
-                className="w-full h-full object-cover brightness-75" 
-                alt="Banner"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a1a]" />
-            </div>
-
-            <div className="px-5 pb-5 -mt-10 relative z-10">
-              {/* Avatar */}
-              <div className="relative inline-block mb-3">
-                <div className="relative w-20 h-20">
-                  <img
-                    src={avatarSrc}
-                    alt={profile.username}
-                    className="w-full h-full rounded-full border-[3px] border-[#1a1a1a] shadow-2xl relative z-10 object-cover"
+        {/* Profile UI Content */}
+        <div className="flex flex-col items-center">
+            {/* Main Profile Card */}
+            <Tilt
+              tiltMaxAngleX={profile.effects.tiltMaxAngle}
+              tiltMaxAngleY={profile.effects.tiltMaxAngle}
+              perspective={1000}
+              scale={1.01}
+              transitionSpeed={2000}
+              gyroscope={true}
+              className="w-full max-w-[320px]"
+            >
+              <motion.div
+                variants={container}
+                initial="hidden"
+                animate="show"
+                className="glass-card rounded-[1.75rem] w-full relative overflow-hidden bg-[#1a1a1a]/80 backdrop-blur-2xl border border-white/5 shadow-2xl"
+              >
+                {/* Banner */}
+                <div className="h-28 w-full relative">
+                  <img 
+                    src={profile.banner || "/assets/banner.jpg"} 
+                    className="w-full h-full object-cover brightness-75" 
+                    alt="Banner"
                   />
-                  {decorationUrl && (
-                    <img 
-                      src={decorationUrl}
-                      alt="Decoration"
-                      className="absolute inset-[-10%] w-[120%] h-[120%] z-20 pointer-events-none"
-                    />
-                  )}
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a1a]" />
                 </div>
-              </div>
 
-              {/* Username */}
-              <motion.div variants={item} className="mb-2">
-                <h1 className="text-3xl font-bold text-white tracking-tighter uppercase text-glow-blue">
-                  {profile.username}
-                </h1>
-              </motion.div>
-
-              {/* Badges Row */}
-              <motion.div variants={item} className="flex gap-1 mb-3">
-                {profile.badges?.map((badge, i) => (
-                  <div key={i} className="w-7 h-7 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden hover:scale-110 transition-transform">
-                    <img src={badge.icon} alt={badge.label} className="w-4 h-4 object-contain p-0.5" />
+                <div className="px-5 pb-5 -mt-10 relative z-10">
+                  {/* Avatar */}
+                  <div className="relative inline-block mb-3">
+                    <div className="relative w-20 h-20">
+                      <div className="relative w-full h-full">
+                        <img
+                          src={avatarSrc}
+                          alt={profile.username}
+                          className="w-full h-full rounded-full border-[3px] border-[#1a1a1a] shadow-2xl relative z-10 object-cover"
+                        />
+                        {decorationUrl && (
+                          <img
+                            src={decorationUrl}
+                            alt="Decoration"
+                            className="absolute top-1/3 left-1/3 w-full h-full rounded-full z-20 pointer-events-none transform -translate-x-1/3 -translate-y-1/3 border-[0px] border-transparent"
+                            style={{ boxSizing: 'border-box' }}
+                          />
+                        )}
+                      </div>
+                    </div>
                   </div>
-                ))}
-              </motion.div>
 
-              {/* Bio Tags */}
-              <motion.div variants={item} className="flex flex-wrap gap-1 mb-5">
-                {bioTags.map((tag, i) => (
-                  <span key={i} className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-medium text-white/90">
-                    {tag}
-                  </span>
-                ))}
-              </motion.div>
+                  {/* Username */}
+                  <motion.div variants={item} className="mb-2">
+                    <h1 className="text-3xl font-bold text-white tracking-tighter uppercase text-glow-blue">
+                      {profile.username}
+                    </h1>
+                  </motion.div>
 
-              {/* Social Links */}
-              <motion.div variants={item} className="mb-5">
-                <SocialLinks links={profile.socialLinks.filter(l => l.platform.toLowerCase() !== 'email')} />
-              </motion.div>
+
+                  {/* Badges Row */}
+                  <motion.div variants={item} className="flex gap-1 mb-3">
+                    {profile.badges?.map((badge, i) => (
+                      <div key={i} className="w-7 h-7 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden hover:scale-110 transition-transform">
+                        <img src={badge.icon} alt={badge.label} className="w-4 h-4 object-contain p-0.5" />
+                      </div>
+                    ))}
+                  </motion.div>
+
+
+                  {/* Bio Tags */}
+                  <motion.div variants={item} className="flex flex-wrap gap-1 mb-2 justify-left">
+                    {bioTags.map((tag, i) => (
+                      <span key={i} className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-medium text-white/90">
+                        {tag}
+                      </span>
+                    ))}
+                  </motion.div>
+
+                  {/* Social Links - After Bio, aligned with bio */}
+                  <motion.div variants={item} className="flex flex-wrap gap-2 justify-left mb-5">
+                    <SocialLinks links={profile.socialLinks.filter(l => l.platform.toLowerCase() !== 'email')} />
+                  </motion.div>
+
 
               {/* Stats Row */}
               <motion.div variants={item} className="flex items-center gap-3 pt-3 border-t border-white/5">
@@ -156,21 +175,39 @@ export default function Home() {
         <div className="w-full max-w-[320px] space-y-3">
           <DiscordWidget config={profile.discord} spotifyConfig={profile.spotify} />
           
+          {/* Spotify Playlist Widget */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-panel rounded-[1.25rem] overflow-hidden bg-black/60 backdrop-blur-xl border border-white/10 shadow-xl"
+          >
+            <iframe 
+              src="https://open.spotify.com/embed/playlist/7tiPEUSHxjSiJ2C5H5UFEn" 
+              width="100%" 
+              height="80" 
+              frameBorder="0" 
+              allowFullScreen 
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              className="rounded-[1.25rem] border-0"
+              style={{ margin: 0, padding: 0 }}
+            />
+          </motion.div>
+          
           {/* Server Widget Mockup */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-panel rounded-[1.5rem] p-4 flex items-center justify-between bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/5 shadow-xl"
+            className="glass-panel rounded-[1.25rem] p-4 flex items-center justify-between bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/5 shadow-xl"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg bg-[#2b2d31]">
-                {profile.discord.serverId ? (
+              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg bg-[#2b2d31] flex items-center justify-center">
+                {profile.discord.serverIcon ? (
                   <img 
-                    src={`https://api.lanyard.rest/v1/guild/${profile.discord.serverId}/icon`} 
+                    src={profile.discord.serverIcon}
                     alt="Server Icon"
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://cdn.discordapp.com/embed/avatars/0.png";
+                      (e.target as HTMLImageElement).style.display = "none";
                     }}
                   />
                 ) : (
@@ -201,7 +238,7 @@ export default function Home() {
             </a>
           </motion.div>
         </div>
-
+      </div>
       </main>
     </>
   );

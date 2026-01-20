@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Profile } from "@shared/schema";
@@ -8,32 +8,62 @@ interface AudioPlayerProps {
   config: Profile["audio"];
 }
 
-export function AudioPlayer({ config }: AudioPlayerProps) {
+export interface AudioPlayerHandle {
+  play: () => Promise<void>;
+  pause: () => void;
+}
+
+export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(({ config }, ref) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
+  useImperativeHandle(ref, () => ({
+    play: async () => {
+      if (audioRef.current) {
+        try {
+          await audioRef.current.play();
+          setIsPlaying(true);
+        } catch (error) {
+          console.error("Failed to play audio:", error);
+        }
+      }
+    },
+    pause: () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    }
+  }));
+
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = config.defaultVolume;
       
-      // Attempt autoplay if configured
+      // Attempt autoplay if configured - add small delay to ensure audio element is ready
       if (config.autoplay) {
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              setIsPlaying(true);
-            })
-            .catch(() => {
-              // Auto-play was prevented
-              setIsPlaying(false);
-            });
-        }
+        const timer = setTimeout(() => {
+          if (audioRef.current) {
+            const playPromise = audioRef.current.play();
+            if (playPromise !== undefined) {
+              playPromise
+                .then(() => {
+                  setIsPlaying(true);
+                })
+                .catch(() => {
+                  // Auto-play was prevented by browser
+                  setIsPlaying(false);
+                });
+            }
+          }
+        }, 500);
+        
+        return () => clearTimeout(timer);
       }
     }
-  }, [config]);
+  }, [config, config.autoplay]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -103,4 +133,6 @@ export function AudioPlayer({ config }: AudioPlayerProps) {
       </motion.div>
     </div>
   );
-}
+});
+
+AudioPlayer.displayName = "AudioPlayer";

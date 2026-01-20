@@ -24,16 +24,13 @@ export async function registerRoutes(
 
 async function seedDatabase() {
   const existingProfile = await storage.getProfile();
-  if (existingProfile) return;
-
-  console.log("Seeding database with initial profile...");
   
-  await storage.createProfile({
+  const profileData = {
     username: "E F T I",
     bio: "I Spend Every Single Moment on Work",
-    status: "online",
+    status: "online" as const,
     pronouns: "",
-    banner: "/assets/album-cover.jpg", // Using existing asset as banner for now
+    banner: "/assets/profilebanner.jpg",
     avatar: {
       src: "/assets/album-cover.jpg",
       alt: "Profile Avatar",
@@ -44,7 +41,8 @@ async function seedDatabase() {
       showStatus: true,
       showActivity: true,
       showDecoration: true,
-      serverId: "1068491603351715890" // Updated with new guild ID
+      serverId: "1068491603351715890",
+      serverIcon: "/assets/servericon.jpg"
     },
     spotify: {
       enabled: true,
@@ -66,7 +64,7 @@ async function seedDatabase() {
     },
     cursor: {
       enabled: true,
-      style: "ring",
+      style: "ring" as const,
       emoji: "✨",
       primaryColor: "hsl(190, 100%, 50%)",
       secondaryColor: "hsl(280, 100%, 60%)"
@@ -109,7 +107,15 @@ async function seedDatabase() {
       brandName: "ProfileLink",
       brandUrl: "#"
     }
-  });
+  };
+
+  if (existingProfile) {
+    console.log("Updating existing profile with serverIcon...");
+    await storage.updateProfile(profileData);
+  } else {
+    console.log("Seeding database with initial profile...");
+    await storage.createProfile(profileData);
+  }
   
-  console.log("Database seeded!");
+  console.log("Database updated!");
 }

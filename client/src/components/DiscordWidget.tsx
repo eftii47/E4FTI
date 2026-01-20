@@ -39,25 +39,28 @@ export function DiscordWidget({ config, spotifyConfig }: DiscordWidgetProps) {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel rounded-[2rem] p-4 flex items-center justify-between bg-black/60 backdrop-blur-xl border border-white/10 relative overflow-hidden"
+          className="glass-panel rounded-[1.25rem] p-3 flex items-center justify-between bg-black/60 backdrop-blur-xl border border-white/10 relative overflow-hidden"
         >
-          <div className="flex items-center gap-4 flex-1 min-w-0">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             {/* Avatar & Decoration */}
             <div className="relative shrink-0">
-              <div className="relative w-14 h-14">
-                <img 
-                  src={`https://cdn.discordapp.com/avatars/${discord_user.id}/${discord_user.avatar}.webp?size=128`} 
-                  alt={discord_user.username}
-                  className="w-full h-full rounded-full bg-secondary object-cover"
-                />
-                {config.showDecoration && decorationUrl && (
+              <div className="relative w-12 h-12">
+                <div className="relative w-full h-full">
                   <img 
-                    src={decorationUrl}
-                    alt="Decoration"
-                    className="absolute inset-[-15%] w-[130%] h-[130%] z-10 pointer-events-none"
+                    src={`https://cdn.discordapp.com/avatars/${discord_user.id}/${discord_user.avatar}.webp?size=128`} 
+                    alt={discord_user.username}
+                    className="w-full h-full rounded-full bg-secondary object-cover relative z-10"
                   />
-                )}
-                <div className={`absolute bottom-0.5 right-0.5 w-4 h-4 rounded-full border-2 border-[#121212] z-20 ${statusColors[discord_status]}`} />
+                  {config.showDecoration && decorationUrl && (
+                    <img 
+                      src={decorationUrl}
+                      alt="Decoration"
+                      className="absolute top-1/3 left-1/3 w-full h-full rounded-full z-20 pointer-events-none transform -translate-x-1/3 -translate-y-1/3 border-[0px] border-transparent"
+                      style={{ boxSizing: 'border-box' }}
+                    />
+                  )}
+                  <div className={`absolute bottom-0.5 right-0.5 w-4 h-4 rounded-full border-2 border-[#121212] z-20 ${statusColors[discord_status]}`} />
+                </div>
               </div>
             </div>
 
