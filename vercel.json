@@ -3,7 +3,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "express",
-  "output": "standalone",
   "env": {
     "DATABASE_URL": "@database_url"
   },
