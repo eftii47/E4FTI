@@ -67,7 +67,7 @@ export default function Home() {
       <Background config={profile.background} effects={profile.effects} theme={profile.theme} />
       <AudioPlayer ref={audioRef} config={profile.audio} />
 
-      <main className="min-h-screen py-8 px-4 flex flex-col items-center justify-start relative z-10 overflow-y-auto gap-4" onClick={handleProfileClick}>
+      <main className="min-h-screen py-8 px-2 sm:px-4 flex flex-col items-center justify-start relative z-10 overflow-y-auto gap-4" onClick={handleProfileClick}>
         
         {/* Profile UI Content */}
         <div className="flex flex-col items-center">
@@ -79,13 +79,13 @@ export default function Home() {
               scale={1.01}
               transitionSpeed={2000}
               gyroscope={true}
-              className="w-full max-w-[320px]"
+              className="w-full max-w-[420px] sm:max-w-[480px]"
             >
               <motion.div
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="glass-card rounded-[1.75rem] w-full relative overflow-hidden bg-[#1a1a1a]/80 backdrop-blur-2xl border border-white/5 shadow-2xl"
+                className="glass-card rounded-[2.25rem] w-full relative overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-3xl border border-white/10 shadow-2xl"
               >
                 {/* Banner */}
                 <div className="h-28 w-full relative">
@@ -172,14 +172,14 @@ export default function Home() {
         </Tilt>
 
         {/* Stacked Widgets */}
-        <div className="w-full max-w-[320px] space-y-3">
+        <div className="w-full max-w-[420px] sm:max-w-[480px] space-y-4">
           <DiscordWidget config={profile.discord} spotifyConfig={profile.spotify} />
           
           {/* Spotify Playlist Widget */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-panel rounded-[1.25rem] overflow-hidden bg-black/60 backdrop-blur-xl border border-white/10 shadow-xl"
+            className="glass-panel rounded-[1.5rem] overflow-hidden bg-black/40 backdrop-blur-2xl border border-white/10 shadow-xl"
           >
             <iframe 
               src="https://open.spotify.com/embed/playlist/7tiPEUSHxjSiJ2C5H5UFEn" 
@@ -197,7 +197,7 @@ export default function Home() {
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-panel rounded-[1.25rem] p-4 flex items-center justify-between bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/5 shadow-xl"
+            className="glass-panel rounded-[1.5rem] p-6 flex items-center justify-between bg-[#1a1a1a]/40 backdrop-blur-2xl border border-white/10 shadow-xl"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg bg-[#2b2d31] flex items-center justify-center">
