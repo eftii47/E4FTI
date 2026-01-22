@@ -236,7 +236,7 @@ export default function Home() {
         }}
       >
         {/* Profile UI Content */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center mt-2 sm:mt-4">
           {/* Main Profile Card */}
           {effects.tiltEnabled ? (
             <Tilt
