@@ -190,7 +190,7 @@ export function ServerWidget({ guildId, serverLink }: ServerWidgetProps) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleClick}
-              className="mt--4 flex-shrink-0 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer"
+              className="mt--4 flex-shrink-0 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[11px] sm:text-sm transition-colors flex items-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer"
             >
               <MessageSquare size={16} />
               Join Server
