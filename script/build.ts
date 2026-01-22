@@ -35,6 +35,10 @@ const allowlist = [
 async function buildAll() {
   await rm("dist", { recursive: true, force: true });
 
+  // Generate profile.json from .env
+  console.log("generating profile.json from .env...");
+  await import("./generate-profile-json");
+
   console.log("building client...");
   await viteBuild();
 

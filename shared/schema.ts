@@ -10,6 +10,8 @@ export const profiles = pgTable("profiles", {
   pronouns: text("pronouns").default(""),
   banner: text("banner").default("/assets/banner.jpg"),
   avatar: jsonb("avatar").$type<{ src: string; alt: string; useDiscord: boolean }>().notNull(),
+  viewImage: text("view_image").default(""), // GIF or JPG for click-to-view overlay
+  viewMedia: text("view_media").default(""), // MP4 or WebM video for click-to-view overlay
   discord: jsonb("discord").$type<{ userId: string; showStatus: boolean; showActivity: boolean; showDecoration: boolean; serverId?: string; serverIcon?: string }>().notNull(),
   spotify: jsonb("spotify").$type<{ enabled: boolean; embedUrl: string; height: number; compact: boolean; showInDiscordStatus: boolean }>().notNull(),
   background: jsonb("background").$type<{ src: string; videoOpacity: number; videoBlur: number }>().notNull(),

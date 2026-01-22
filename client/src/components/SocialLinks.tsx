@@ -28,9 +28,10 @@ interface SocialLinksProps {
 interface SocialIconImageProps {
   platform: string;
   fallback: React.ElementType;
+  size?: number;
 }
 
-function SocialIconImage({ platform, fallback: Fallback }: SocialIconImageProps) {
+function SocialIconImage({ platform, fallback: Fallback, size = 24 }: SocialIconImageProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -76,7 +77,8 @@ function SocialIconImage({ platform, fallback: Fallback }: SocialIconImageProps)
       <img
         src={imageUrl}
         alt={platform}
-        className="w-5 h-5 object-contain"
+        style={{ width: size, height: size }}
+        className="object-contain"
       />
     );
   }
@@ -99,29 +101,13 @@ export function SocialLinks({ links }: SocialLinksProps) {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              "interactive relative inline-flex items-center justify-center",
-              "w-7 h-7 rounded-full transition-all duration-200",
-              "hover:scale-110 hover:-translate-y-1",
-              "active:scale-95"
+              "inline-flex items-center justify-center w-8 h-8 transition-all duration-200 hover:scale-110 hover:-translate-y-1 active:scale-95"
             )}
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.95 }}
-            style={{
-              boxShadow: "0 0 10px rgba(255, 255, 255, 0.1)",
-            }}
           >
-            {/* Glow effect background */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-white/5 opacity-0 hover:opacity-100 transition-opacity blur-sm" />
-            
-            {/* Icon container with glow */}
-            <div className="relative z-10 flex items-center justify-center text-white/80 hover:text-white transition-colors">
-              <SocialIconImage platform={link.platform} fallback={Icon} />
-            </div>
-
-            {/* Subtle glow ring on hover */}
-            <div className="absolute inset-0 rounded-full border border-white/0 hover:border-white/30 transition-all" />
-            
             <span className="sr-only">{link.platform}</span>
+            <SocialIconImage platform={link.platform} fallback={Icon} size={24} />
           </motion.a>
         );
       })}

@@ -1,5 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
+/* Bio blue glow effect for bio UI box fields */
+.bio-blue-glow {
+  box-shadow: 0 0 12px 2px #0a225e, 0 0 4px 1px #1e3a8a;
+}
+/* Bio white text with black border for bold effect */
+.bio-white-stroke {
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000,
+     0px  2px 8px #000;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -39,7 +53,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
     @apply bg-background text-foreground antialiased font-sans overflow-x-hidden;
