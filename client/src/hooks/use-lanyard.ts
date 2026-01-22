@@ -63,33 +63,39 @@ export function useLanyard({ userId, enabled = true }: UseLanyardOptions) {
     const connect = () => {
       try {
         // Fetch initial data from our server endpoint
+        console.log('[Lanyard] Connecting for userId:', userId);
         fetch(`/api/discord/presence/${userId}`)
           .then((res) => {
+            console.log('[Lanyard] Server endpoint response:', res.status);
             if (!res.ok) throw new Error(`Status ${res.status}`);
             return res.json();
           })
           .then((json) => {
+            console.log('[Lanyard] Server endpoint data received:', json);
             if (isComponentMounted) {
               setData(json);
               setStatus("connected");
             }
           })
           .catch((err) => {
-            console.warn("Server endpoint fallback:", err.message);
+            console.warn("[Lanyard] Server endpoint failed:", err.message);
             // Try direct Lanyard API as fallback
+            console.log('[Lanyard] Trying fallback to direct Lanyard API');
             return fetch(`https://api.lanyard.rest/v1/users/${userId}`)
               .then((res) => {
+                console.log('[Lanyard] Direct API response:', res.status);
                 if (!res.ok) throw new Error(`Status ${res.status}`);
                 return res.json();
               })
               .then((json) => {
+                console.log('[Lanyard] Direct API data received:', json);
                 if (isComponentMounted && json.success) {
                   setData(json.data);
                   setStatus("connected");
                 }
               })
               .catch((fallbackErr) => {
-                console.error("Both endpoints failed:", fallbackErr);
+                console.error("[Lanyard] Both endpoints failed:", fallbackErr);
                 if (isComponentMounted) {
                   setStatus("error");
                 }

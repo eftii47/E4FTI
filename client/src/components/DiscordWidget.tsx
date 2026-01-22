@@ -17,9 +17,40 @@ const statusColors = {
 
 export function DiscordWidget({ config, spotifyConfig }: DiscordWidgetProps) {
   const safeSpotifyConfig = spotifyConfig || { enabled: false, showInDiscordStatus: false };
-  const { data, status } = useLanyard({ userId: config.userId });
+  const { data, status } = useLanyard({ userId: config.userId, enabled: !!config.userId });
 
-  if (status !== "connected" || !data) return null;
+  // Debug logging
+  if (typeof window !== 'undefined') {
+    console.log('[DiscordWidget] userId:', config.userId, 'status:', status, 'hasData:', !!data);
+  }
+
+  // If no userId, don't show widget
+  if (!config.userId || !config.showStatus) {
+    return null;
+  }
+
+  // If Lanyard failed but we should show status, show a minimal fallback
+  if (status === "error" || !data) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-panel rounded-[1.25rem] p-3 bg-black/60 backdrop-blur-xl border border-white/10"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-2xl">
+            💜
+          </div>
+          <div className="flex-1">
+            <p className="text-white font-bold text-sm">Discord</p>
+            <p className="text-xs text-white/50">Loading...</p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (!data) return null;
 
   const { discord_user, discord_status, activities: rawActivities, spotify, listening_to_spotify } = data;
   const activities = Array.isArray(rawActivities) ? rawActivities : [];
