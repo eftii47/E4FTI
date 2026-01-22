@@ -25,23 +25,52 @@ export default async function handler(
     instant_invite: inviteCode ? `https://discord.gg/${inviteCode}` : undefined,
     members: [],
     presence_count: 0,
+    approximate_member_count: 0,
+    approximate_presence_count: 0,
     fallback: true,
   };
 
   try {
     console.log('[Vercel API][Guild] Fetching widget for:', guildId);
-    const url = `https://discord.com/api/v10/guilds/${guildId}/widget.json`;
-    const response = await fetch(url);
 
-    if (!response.ok) {
-      console.error('[Vercel API][Guild] Widget API returned:', response.status);
-      return res.status(response.status).json({ ...fallbackData, error: 'widget_unavailable' });
+    // Fetch widget
+    const widgetUrl = `https://discord.com/api/v10/guilds/${guildId}/widget.json`;
+    const widgetRes = await fetch(widgetUrl);
+
+    // Fetch invite counts if invite code present
+    let inviteCounts: { memberCount: number | null; presenceCount: number | null } | null = null;
+    if (inviteCode) {
+      try {
+        const inviteUrl = `https://discord.com/api/v10/invites/${inviteCode}?with_counts=true&with_expiration=true`;
+        const inviteRes = await fetch(inviteUrl);
+        if (inviteRes.ok) {
+          const inviteData = await inviteRes.json();
+          inviteCounts = {
+            memberCount: typeof inviteData.approximate_member_count === 'number' ? inviteData.approximate_member_count : null,
+            presenceCount: typeof inviteData.approximate_presence_count === 'number' ? inviteData.approximate_presence_count : null,
+          };
+        } else {
+          console.error('[Vercel API][Guild] Invite counts API returned:', inviteRes.status);
+        }
+      } catch (err) {
+        console.error('[Vercel API][Guild] Invite counts fetch error:', err);
+      }
     }
 
-    const data = await response.json();
+    if (!widgetRes.ok) {
+      console.error('[Vercel API][Guild] Widget API returned:', widgetRes.status);
+      return res.status(widgetRes.status).json({ ...fallbackData, ...inviteCounts, error: 'widget_unavailable' });
+    }
+
+    const data = await widgetRes.json();
     if (!data || !data.name) {
-      return res.status(404).json({ ...fallbackData, error: 'invalid_widget_data' });
+      return res.status(404).json({ ...fallbackData, ...inviteCounts, error: 'invalid_widget_data' });
     }
+
+    // Combine counts: prefer invite counts, fall back to widget
+    const approximate_member_count = inviteCounts?.memberCount ?? data.approximate_member_count ?? data.members?.length ?? 0;
+    const approximate_presence_count = inviteCounts?.presenceCount ?? data.approximate_presence_count ?? data.presence_count ?? data.members?.length ?? 0;
+    const presence_count = typeof data.presence_count === 'number' ? data.presence_count : data.members?.length || 0;
 
     res.setHeader('Cache-Control', 'public, s-maxage=20, stale-while-revalidate=60');
     return res.status(200).json({
@@ -50,10 +79,10 @@ export default async function handler(
       icon: data.icon || serverIcon,
       instant_invite: data.instant_invite || fallbackData.instant_invite,
       members: data.members || [],
-      presence_count: typeof data.presence_count === 'number' ? data.presence_count : data.members?.length || 0,
-      approximate_member_count: data.approximate_member_count ?? data.members?.length ?? 0,
-      approximate_presence_count: data.approximate_presence_count ?? data.presence_count ?? data.members?.length ?? 0,
-      source: url
+      presence_count,
+      approximate_member_count,
+      approximate_presence_count,
+      source: widgetUrl
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'unknown_error';
