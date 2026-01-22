@@ -24,17 +24,25 @@ export const ProfileViewOverlay = ({
   const [isLoading, setIsLoading] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [gifError, setGifError] = useState(false);
   
-  // Media paths
-  const videoPath = viewMedia;
-  const imagePath = viewImage;
+  // Helper function to get file extension
+  const getExtension = (path: string) => path?.split('.')?.pop()?.toLowerCase() || '';
   
-  // Logic: Try video first, if it fails show image instead
-  const showVideo = videoPath && !videoError;
-  const showImage = (imagePath && !imageError) && (!showVideo || videoError);
+  // Determine if a path is a GIF
+  const isGif = (path?: string) => path && getExtension(path) === 'gif';
+  
+  // Media paths - prioritize GIF if available, fallback to MP4
+  const gifPath = viewImage && isGif(viewImage) ? viewImage : undefined;
+  const mp4Path = viewMedia || (viewImage && !isGif(viewImage) ? viewImage : undefined);
+  
+  // Logic: Try GIF first, if it fails try MP4, then fallback to static image
+  const showGif = gifPath && !gifError;
+  const showVideo = !showGif && mp4Path && !videoError;
+  const showImage = !showGif && !showVideo && viewImage;
   
   // Debug logging
-  console.log("ProfileViewOverlay - videoPath:", videoPath, "imagePath:", imagePath, "showVideo:", showVideo, "showImage:", showImage, "videoError:", videoError, "imageError:", imageError);
+  console.log("ProfileViewOverlay - gifPath:", gifPath, "mp4Path:", mp4Path, "imagePath:", viewImage, "showGif:", showGif, "showVideo:", showVideo, "showImage:", showImage, "gifError:", gifError, "videoError:", videoError);
 
   // Trigger audio play and animations when overlay opens
   useEffect(() => {
@@ -95,8 +103,8 @@ export const ProfileViewOverlay = ({
               }
             }}
           >
-            {/* Media Container - supports both images and videos from either attribute */}
-            {(videoPath || imagePath) && (
+            {/* Media Container - supports GIFs, videos, and images with priority fallback */}
+            {(gifPath || mp4Path || viewImage) && (
               <motion.div
                 className="relative w-screen h-screen flex items-center justify-center"
                 initial={{ opacity: 0 }}
@@ -106,43 +114,62 @@ export const ProfileViewOverlay = ({
                 {/* Animated Border Glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 pointer-events-none animate-pulse" />
                 
-                {/* Video - try to load first, falls back to image on error */}
+                {/* GIF - try to load first */}
+                {showGif && (
+                  <img
+                    src={gifPath}
+                    alt="Profile View GIF"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onLoad={() => {
+                      console.log('GIF loaded:', gifPath);
+                      setIsLoading(false);
+                    }}
+                    onLoadCapture={() => setIsLoading(true)}
+                    onError={(e) => {
+                      console.error('GIF error, trying MP4 fallback:', gifPath, e);
+                      setGifError(true);
+                      setIsLoading(false);
+                    }}
+                  />
+                )}
+                
+                {/* Video (MP4) - fallback if GIF fails */}
                 {showVideo && (
                   <video
-                    src={videoPath}
+                    src={mp4Path}
                     className="absolute inset-0 w-full h-full object-cover"
                     autoPlay
                     loop
                     muted
                     onLoadedData={() => {
-                      console.log('Video loaded:', videoPath);
+                      console.log('Video loaded:', mp4Path);
                       setIsLoading(false);
                     }}
                     onLoadStart={() => {
-                      console.log('Video loading:', videoPath);
+                      console.log('Video loading:', mp4Path);
                       setIsLoading(true);
                     }}
                     onError={(e) => {
-                      console.error('Video error, falling back to image:', videoPath, e);
+                      console.error('Video error, falling back to image:', mp4Path, e);
                       setVideoError(true);
                       setIsLoading(false);
                     }}
                   />
                 )}
                 
-                {/* Image - shows if video is not present or if video failed to load */}
+                {/* Image - shows if both GIF and video failed */}
                 {showImage && (
                   <img
-                    src={imagePath}
+                    src={viewImage}
                     alt="Profile View"
                     className="absolute inset-0 w-full h-full object-cover"
                     onLoad={() => {
-                      console.log('Image loaded:', imagePath);
+                      console.log('Image loaded:', viewImage);
                       setIsLoading(false);
                     }}
                     onLoadCapture={() => setIsLoading(true)}
                     onError={(e) => {
-                      console.error('Image error:', imagePath, e);
+                      console.error('Image error:', viewImage, e);
                       setImageError(true);
                       setIsLoading(false);
                     }}

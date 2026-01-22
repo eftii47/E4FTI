@@ -1,11 +1,11 @@
 {
   "username": "E F T I",
-  "bio": "hi is 3 4 5 6 7 8 9 10 11 12",
+  "bio": "𝓢𝓵𝓮𝓮𝓹𝓲𝓷𝓰",
   "status": "online",
   "pronouns": "he/him",
   "banner": "/assets/profilebanner.jpg",
   "avatar": {
-    "src": "/assets/album-cover.jpg",
+    "src": "/assets/album-cover.jpgS",
     "alt": "Profile Avatar",
     "useDiscord": true
   },
@@ -14,9 +14,9 @@
     "showStatus": true,
     "showActivity": true,
     "showDecoration": true,
-    "serverId": "1013139902101192784",
+    "serverId": "1068491603351715890",
     "serverIcon": "/assets/servericon.jpg",
-    "serverName": "Banters"
+    "serverName": "BeyondTheBanters"
   },
   "spotify": {
     "enabled": true,
@@ -39,7 +39,7 @@
   "socialLinks": [
     {
       "platform": "facebook",
-      "url": "https://facebook.com/e4ft"
+      "url": "https://facebook.com/e4fti"
     },
     {
       "platform": "twitter",
@@ -91,7 +91,7 @@
     "tiltMaxAngle": 8,
     "noiseEnabled": false,
     "showViews": true,
-    "viewCount": 90000009
+    "viewCount": 1685
   },
   "footer": {
     "text": "Made with ❤️ by Efti",

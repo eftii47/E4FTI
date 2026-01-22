@@ -54,7 +54,7 @@ export function CustomCursor({ config, customImage }: CustomCursorProps) {
       document.body.classList.remove("hovering");
       document.body.style.cursor = '';
       document.documentElement.style.cursor = '';
-    };stomImage, cu
+    };
   }, [config.enabled, cursorX, cursorY]);
 
   // Always show custom cursor image if provided, regardless of config.enabled
