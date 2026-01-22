@@ -64,7 +64,7 @@ export function useLanyard({ userId, enabled = true }: UseLanyardOptions) {
       try {
         // Fetch initial data from our server endpoint
         console.log('[Lanyard] Connecting for userId:', userId);
-        fetch(`/api/discord/presence/${userId}`)
+        fetch(`/api/discord/${userId}`)
           .then((res) => {
             console.log('[Lanyard] Server endpoint response:', res.status);
             if (!res.ok) throw new Error(`Status ${res.status}`);

@@ -68,7 +68,7 @@ export const api = {
   discord: {
     presence: {
       method: 'GET' as const,
-      path: '/api/discord/presence/:userId',
+      path: '/api/discord/:userId',
       responses: {
         200: discordPresenceSchema,
         404: errorSchemas.notFound,

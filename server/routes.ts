@@ -138,7 +138,7 @@ export async function registerRoutes(
   });
 
   // Discord presence endpoint (fetches from Lanyard API server-side)
-  app.get("/api/discord/presence/:userId", async (req, res) => {
+  app.get("/api/discord/:userId", async (req, res) => {
     const { userId } = req.params;
 
     if (!userId) {
