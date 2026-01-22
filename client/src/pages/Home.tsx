@@ -17,6 +17,7 @@ import { useRef } from "react";
 export default function Home() {
   const { data: profile, isLoading, error } = useProfile();
   const isAndroid = typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
+  const isIOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/i.test(navigator.userAgent);
   // Fallbacks from VITE_ env vars if profile is missing fields
   const fallbackProfile = {
     username: import.meta.env.VITE_USERNAME || "User",
@@ -98,7 +99,14 @@ export default function Home() {
   const audioRef = useRef<AudioPlayerHandle>(null);
   const cardWidth = isAndroid
     ? "max-w-[300px] xs:max-w-[330px] sm:max-w-[360px]"
-    : "max-w-[320px] xs:max-w-[360px] sm:max-w-[400px] md:max-w-[420px]";
+    : isIOS
+      ? "max-w-[340px] xs:max-w-[380px] sm:max-w-[420px] md:max-w-[440px]"
+      : "max-w-[320px] xs:max-w-[360px] sm:max-w-[400px] md:max-w-[420px]";
+  const mainSpacing = isAndroid
+    ? "py-3 px-2 gap-2.5"
+    : isIOS
+      ? "py-5 sm:py-9 px-4 sm:px-5 gap-3.5 sm:gap-4.5"
+      : "py-4 sm:py-8 px-3 sm:px-4 gap-3 sm:gap-4";
 
   // Scroll-based tilt state
   const [scrollTilt, setScrollTilt] = useState({ x: 0, y: 0 });
@@ -221,9 +229,7 @@ export default function Home() {
       <AudioPlayer ref={audioRef} config={mergedProfile?.audio ?? { src: "", autoplay: false, loop: false, defaultVolume: 1 }} />
 
       <main
-        className={`min-h-screen flex flex-col items-center justify-start relative z-10 overflow-y-auto ${
-          isAndroid ? "py-3 px-2 gap-2.5" : "py-4 sm:py-8 px-3 sm:px-4 gap-3 sm:gap-4"
-        }`}
+        className={`min-h-screen flex flex-col items-center justify-start relative z-10 overflow-y-auto ${mainSpacing}`}
         onClick={e => {
           handleProfileClick();
           handleTiltTap(e);
