@@ -58,34 +58,67 @@ export function useLanyard({ userId, enabled = true }: UseLanyardOptions) {
 
     let socket: WebSocket | null = null;
     let heartbeatInterval: any = null;
+    let isComponentMounted = true;
 
     const connect = () => {
       try {
-        fetch(`https://api.lanyard.rest/v1/users/${userId}`)
-          .then((res) => res.json())
-          .then((json) => {
-            if (json.success) setData(json.data);
+        // Fetch initial data from our server endpoint
+        fetch(`/api/discord/presence/${userId}`)
+          .then((res) => {
+            if (!res.ok) throw new Error(`Status ${res.status}`);
+            return res.json();
           })
-          .catch(console.error);
+          .then((json) => {
+            if (isComponentMounted) {
+              setData(json);
+              setStatus("connected");
+            }
+          })
+          .catch((err) => {
+            console.warn("Server endpoint fallback:", err.message);
+            // Try direct Lanyard API as fallback
+            return fetch(`https://api.lanyard.rest/v1/users/${userId}`)
+              .then((res) => {
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                return res.json();
+              })
+              .then((json) => {
+                if (isComponentMounted && json.success) {
+                  setData(json.data);
+                  setStatus("connected");
+                }
+              })
+              .catch((fallbackErr) => {
+                console.error("Both endpoints failed:", fallbackErr);
+                if (isComponentMounted) {
+                  setStatus("error");
+                }
+              });
+          });
 
+        // Try WebSocket connection for real-time updates
         socket = new WebSocket("wss://api.lanyard.rest/socket");
 
         socket.onopen = () => {
-          setStatus("connected");
-          socket?.send(
-            JSON.stringify({
-              op: 2,
-              d: { subscribe_to_id: userId },
-            })
-          );
+          if (isComponentMounted) {
+            socket?.send(
+              JSON.stringify({
+                op: 2,
+                d: { subscribe_to_id: userId },
+              })
+            );
+          }
         };
 
         socket.onmessage = (event) => {
+          if (!isComponentMounted) return;
+
           const message = JSON.parse(event.data);
 
           if (message.op === 0) {
             if (message.t === "INIT_STATE" || message.t === "PRESENCE_UPDATE") {
               setData(message.d);
+              setStatus("connected");
             }
           } else if (message.op === 1) {
             if (heartbeatInterval) clearInterval(heartbeatInterval);
@@ -98,18 +131,32 @@ export function useLanyard({ userId, enabled = true }: UseLanyardOptions) {
         };
 
         socket.onclose = () => {
-          if (heartbeatInterval) clearInterval(heartbeatInterval);
-          setStatus("error");
+          if (isComponentMounted && heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+          }
+          // Don't set error immediately - REST API already provided data
+          if (!data) {
+            setStatus("error");
+          }
+        };
+
+        socket.onerror = () => {
+          if (isComponentMounted && !data) {
+            setStatus("error");
+          }
         };
       } catch (err) {
         console.error("Lanyard connection error:", err);
-        setStatus("error");
+        if (isComponentMounted) {
+          setStatus("error");
+        }
       }
     };
 
     connect();
 
     return () => {
+      isComponentMounted = false;
       if (heartbeatInterval) clearInterval(heartbeatInterval);
       if (socket) socket.close();
     };

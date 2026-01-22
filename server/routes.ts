@@ -137,6 +137,42 @@ export async function registerRoutes(
     }
   });
 
+  // Discord presence endpoint (fetches from Lanyard API server-side)
+  app.get("/api/discord/presence/:userId", async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+
+    try {
+      console.log("Fetching Discord presence for:", userId);
+
+      // Try REST API first (faster)
+      const restUrl = `https://api.lanyard.rest/v1/users/${userId}`;
+      const restResponse = await fetch(restUrl);
+
+      if (restResponse.ok) {
+        const restData = await restResponse.json();
+        if (restData.success && restData.data) {
+          console.log("Discord presence fetched from REST API");
+          return res.json(restData.data);
+        }
+      }
+
+      // Fallback: return error if REST API fails
+      return res.status(404).json({ 
+        message: "Unable to fetch Discord presence. Lanyard API may be unavailable." 
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown_error";
+      console.error("Error fetching Discord presence:", message);
+      return res.status(500).json({ 
+        message: "Internal server error while fetching Discord presence" 
+      });
+    }
+  });
+
   // Seed data function
   await seedDatabase();
 
