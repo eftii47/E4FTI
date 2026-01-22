@@ -23,6 +23,13 @@ export async function registerRoutes(
     const inviteCode = process.env.VITE_DISCORD_INVITE_CODE;
     const serverIcon = process.env.VITE_DISCORD_SERVER_ICON || "/assets/servericon.jpg";
 
+    console.log("[Guild Endpoint] Reading env vars:", {
+      serverName,
+      inviteCode,
+      serverIcon,
+      guildId
+    });
+
     // Base fallback data
     const fallbackData = {
       id: guildId,
