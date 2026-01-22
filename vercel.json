@@ -6,9 +6,5 @@
   "outputDirectory": "dist/public",
   "env": {
     "DATABASE_URL": "postgresql://postgres:ShantoIslam1@#*@db.penfzkpvbhpdewzgcidt.supabase.co:5432/postgres"
-  },
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/dist/index.cjs" }
-  ]
+  }
 }
