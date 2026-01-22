@@ -216,7 +216,7 @@ export default function Home() {
       <Background config={mergedProfile?.background ?? { src: "", videoOpacity: 1, videoBlur: 0 }} effects={mergedProfile?.effects} theme={mergedProfile?.theme ?? { glowCyan: "#00fff7", glowPurple: "#a259ff", glowPink: "#ff6ec4" }} />
       <AudioPlayer ref={audioRef} config={mergedProfile?.audio ?? { src: "", autoplay: false, loop: false, defaultVolume: 1 }} />
 
-      <main className="min-h-screen py-8 px-4 flex flex-col items-center justify-start relative z-10 overflow-y-auto gap-4" onClick={e => { handleProfileClick(); handleTiltTap(e); }}>
+      <main className="min-h-screen py-4 sm:py-8 px-3 sm:px-4 flex flex-col items-center justify-start relative z-10 overflow-y-auto gap-3 sm:gap-4" onClick={e => { handleProfileClick(); handleTiltTap(e); }}>
         {/* Profile UI Content */}
         <div className="flex flex-col items-center">
           {/* Main Profile Card */}
@@ -230,7 +230,7 @@ export default function Home() {
               gyroscope={true}
               tiltAngleXManual={tapTilt !== 0 ? tapTilt : scrollTilt.x}
               tiltAngleYManual={scrollTilt.y}
-              className="w-full max-w-[400px] sm:max-w-[420px]"
+              className="w-full max-w-[320px] xs:max-w-[360px] sm:max-w-[400px] md:max-w-[420px]"
             >
               <motion.div
                 variants={container}
@@ -247,12 +247,12 @@ export default function Home() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a1a]/80" />
                 </div>
-                <div className="px-5 pb-5 -mt-10 relative z-10">
+                <div className="px-3 sm:px-5 pb-3 sm:pb-5 -mt-8 sm:-mt-10 relative z-10">
                   {/* Avatar */}
                   <div 
                     className="relative inline-block mb-3"
                   >
-                    <div className="relative w-20 h-20">
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20">
                       <div className="relative w-full h-full">
                         <img
                           src={avatarSrc}
@@ -272,7 +272,7 @@ export default function Home() {
                   </div>
                   {/* Username */}
                   <motion.div variants={item} className="mb-2">
-                    <h1 className="text-3xl font-bold text-white tracking-tighter uppercase text-glow-blue">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tighter uppercase text-glow-blue">
                       {displayUsername}
                     </h1>
                   </motion.div>
@@ -422,7 +422,7 @@ export default function Home() {
             </motion.div>
           )}
           {/* Stacked Widgets with Tilt */}
-          <div className="w-full max-w-[400px] sm:max-w-[420px] space-y-3 mt-4">
+          <div className="w-full max-w-[320px] xs:max-w-[360px] sm:max-w-[400px] md:max-w-[420px] space-y-2 sm:space-y-3 mt-3 sm:mt-4">
             {/* Discord Widget */}
             {effects.tiltEnabled ? (
               <Tilt
