@@ -250,23 +250,14 @@ export default function Home() {
                 <div className="px-5 pb-5 -mt-10 relative z-10">
                   {/* Avatar */}
                   <div 
-                    className="relative inline-block mb-3 cursor-pointer group"
-                    onClick={handleAvatarClick}
+                    className="relative inline-block mb-3"
                   >
                     <div className="relative w-20 h-20">
-                      {/* Click to View Indicator */}
-                      {mergedProfile?.viewImage && (
-                        <motion.div
-                          className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 group-hover:opacity-40 transition-opacity duration-300 z-5"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                        />
-                      )}
                       <div className="relative w-full h-full">
                         <img
                           src={avatarSrc}
                           alt={displayUsername}
-                          className="w-full h-full rounded-full border-[3px] border-[#1a1a1a] shadow-2xl relative z-10 object-cover group-hover:shadow-2xl group-hover:shadow-cyan-500/50 transition-all duration-300"
+                          className="w-full h-full rounded-full border-[3px] border-[#1a1a1a] shadow-2xl relative z-10 object-cover"
                         />
                         {decorationUrl && (
                           <img
@@ -277,15 +268,6 @@ export default function Home() {
                           />
                         )}
                       </div>
-                      {/* Click to View Label */}
-                      {mergedProfile?.viewImage && (
-                        <motion.div
-                          className="absolute bottom-0 right-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full p-1.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          whileHover={{ scale: 1.1 }}
-                        >
-                          <Camera className="w-3 h-3 text-white" />
-                        </motion.div>
-                      )}
                     </div>
                   </div>
                   {/* Username */}
